@@ -7,13 +7,17 @@
 
     function parsePath(key) {
         var p = [];
-        key.replace(pathRegex, function(a,b) {
-            if(b !== undefined) {
-                p.push(parseInt(b));
-            } else {
-                p.push(a);
-            }
-        });
+        if(typeof key !== 'string') {
+            p.push(key);
+        } else {
+            key.replace(pathRegex, function(a,b) {
+                if(b !== undefined) {
+                    p.push(parseInt(b));
+                } else {
+                    p.push(a);
+                }
+            });
+        }
         return p;
     }
 

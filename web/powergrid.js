@@ -1251,6 +1251,9 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
         },
 
         normalizeCssClass: function(c) {
+            if(typeof c !== 'string'){
+                return c;
+            }
             return c.replace(/[.\[\]]/g, '_');
         }
     };
