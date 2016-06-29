@@ -8,7 +8,7 @@
          vein: "../bower_components/veinjs/vein",
          requirejs: "../bower_components/requirejs/require",
          jquerydist: "../bower_components/jquery/dist/jquery",
-         jquery: "jquery",
+         jquery: "../bower_components/jquery/dist/jquery",
          utils: "utils",
          override: "override",
          "es6-promise": "../bower_components/es6-promise/promise",

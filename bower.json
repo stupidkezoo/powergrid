@@ -28,5 +28,8 @@
   },
   "devDependencies": {
     "qunit": "~1.23.0"
+  },
+  "resolutions": {
+    "jquery": "~2.1.4"
   }
 }
