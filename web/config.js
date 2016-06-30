@@ -18,7 +18,9 @@
          qunit: "../bower_components/qunit/qunit/qunit",
          text: "../bower_components/requirejs-text/text",
          "requirejs-text": "../bower_components/requirejs-text/text",
-         w2ui: "../bower_components/w2ui/w2ui-1.4.3.min"
+         w2ui: "../bower_components/w2ui/w2ui-1.4.3.min",
+         react: "../bower_components/react/react",
+         "react-dom": "../bower_components/react/react-dom"
       },
       packages: [
    
