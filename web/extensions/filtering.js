@@ -1,4 +1,6 @@
-define(['override', 'jquery', 'text!../templates/filterPane.html', 'text!../templates/filterBox.html'], function(override, $, filterPane, filterBox) {
+define(['../override', '../jquery', '../utils',
+    '../templates/filterPane.html!text',
+    '../templates/filterBox.html!text'], function(override, $, utils, filterPane, filterBox) {
     "use strict";
     
     function FilteringDataSource(delegate) {
@@ -15,6 +17,10 @@ define(['override', 'jquery', 'text!../templates/filterPane.html', 'text!../temp
         
         if(delegate.isReady()) {
             this.reload();
+        }
+
+        if(typeof delegate.sort === 'function') {
+            this.sort = delegate.sort.bind(delegate);
         }
     }
     
@@ -174,7 +180,7 @@ define(['override', 'jquery', 'text!../templates/filterPane.html', 'text!../temp
                         
                         rowMatches: function(settings, row) {
                             for(var x in settings) {
-                                if(!this.valueMatches(settings[x], row[x])) {
+                                if(!this.valueMatches(settings[x], utils.getValue(row, x))) {
                                     if(settings[x].type == 'inclusive') {
                                         return 0;
                                     }

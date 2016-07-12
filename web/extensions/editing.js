@@ -1,4 +1,4 @@
-define(['override', 'jquery', 'utils'], function(override, $, utils) {
+define(['../override', '../jquery', '../utils'], function(override, $, utils) {
     
     "use strict";
     
@@ -58,7 +58,7 @@ define(['override', 'jquery', 'utils'], function(override, $, utils) {
 
                     startEdit: function(target, key, record, rowIdx) {
                         var column = grid.getColumnForKey(key);
-                        var oldValue = record[key];
+                        var oldValue = utils.getValue(record, key);
                         var editor = this.createEditor(record, column, oldValue);
                         var editing = this;
                         

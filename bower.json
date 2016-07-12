@@ -24,9 +24,13 @@
     "jsrender": "~1.0.0",
     "jquery": "~1.11.1",
     "requirejs-text": "~2.0.12",
-    "w2ui": "~1.4"
+    "w2ui": "~1.4",
+    "react": "^15.1.0"
   },
   "devDependencies": {
     "qunit": "~1.23.0"
+  },
+  "resolutions": {
+    "jquery": "~2.1.4"
   }
 }
