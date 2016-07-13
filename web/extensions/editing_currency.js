@@ -7,18 +7,18 @@
  *  - currencyPrecision
  */
 
-define(['../override', '../jquery', '../utils', 'w2ui'], function(override, $) {
+define(['../override', 'jquery', '../utils', 'w2ui'], function(override, $) {
 
-    "use strict";
+    'use strict';
 
     return {
         requires: {
             editing: {
                 editors: {
                     currency: function(record, column, value) {
-                        var input = $("<input>").w2field('money', {
+                        var input = $('<input>').w2field('money', {
                             autoFormat: true,
-                            currencyPrefix: '€',
+                            currencyPrefix: 'ï¿½',
                             currencyPrecision: column.precision,
                             precision: column.precision
                         });

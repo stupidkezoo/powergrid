@@ -1,14 +1,16 @@
 window.define = System.amdDefine;
 window.require = window.requirejs = System.amdRequire;
 
-import PowerGrid from './powergrid';
-import ArrayDataSource from './arraydatasource';
-import JsonDataSource from './jsondatasource';
-import GroupingDataSource from './datasources/groupingdatasource';
-import SortingDataSource from './datasources/sortingdatasource';
+var PowerGrid = require('./powergrid');
+var ArrayDataSource = require('./arraydatasource');
+var JsonDataSource = require('./jsondatasource');
+var GroupingDataSource = require('./datasources/groupingdatasource');
+var SortingDataSource = require('./datasources/sortingdatasource');
 
-export { PowerGrid };
-export { ArrayDataSource };
-export { JsonDataSource };
-export { GroupingDataSource };
-export { SortingDataSource };
+var exports = module.exports = {};
+
+exports.PowerGrid = PowerGrid;
+exports.ArrayDataSource = ArrayDataSource;
+exports.JsonDataSource = JsonDataSource;
+exports.GroupingDataSource = GroupingDataSource;
+exports.SortingDataSource = SortingDataSource;

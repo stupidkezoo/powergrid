@@ -1,5 +1,4 @@
-define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein, utils, Promise, require) {
-    "use strict";
+define(['jquery', 'veinjs', './utils', './promise'], function($, vein, utils, Promise) {
 
     var defaultOptions = {
         virtualScrollingExcess: 10, // defines the number of extra rows to render on each side (top/bottom) of the viewport. This reduces flickering when scrolling.
@@ -13,8 +12,8 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
 
     function determineScrollBarSize() {
         // Creates a dummy div just to measure the scrollbar sizes, then deletes it when it's no longer necessary.
-        var dummy = $("<div style='overflow: scroll; width: 100px; height: 100px; visibility: none; opacity: 0'></div>");
-        var filler = $("<div style='width:100%; height: 100%;'></div>");
+        var dummy = $('<div style=\'overflow: scroll; width: 100px; height: 100px; visibility: none; opacity: 0\'></div>');
+        var filler = $('<div style=\'width:100%; height: 100%;\'></div>');
         dummy.append(filler);
         $('body').append(dummy);
 
@@ -30,25 +29,17 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
 
     var scrollBarSize;
 
-    $(function() {
-        scrollBarSize = determineScrollBarSize();
-
-        //adjust the margin to compensate for the scrollbar
-        vein.inject('.pg-rowgroup', {'width': "calc(100% - " + scrollBarSize.width + "px)"});
-        vein.inject('.pg-rowgroup.pg-footer', {'bottom': scrollBarSize.width + "px"});
-    });
-
     function elementWithClasses(tagname, classes) {
         var el = document.createElement(tagname);
         if(classes) {
             el.className=classes;
         }
         return el;
-    };
+    }
 
     function nonFalse(e) {
         return e !== false;
-    };
+    }
 
     function overlap(a,b) {
         if(!a || !b) return false;
@@ -92,12 +83,18 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
         beginInit: function(callback) {
             var grid = this;
 
+            scrollBarSize = determineScrollBarSize();
+
+            //adjust the margin to compensate for the scrollbar
+            vein.inject('.pg-rowgroup', {'width': 'calc(100% - ' + scrollBarSize.width + 'px)'});
+            vein.inject('.pg-rowgroup.pg-footer', {'bottom': scrollBarSize.width + 'px'});
+
             if(this.options.extensions) {
                 this.loadExtensions(function(pluginList, plugins) {
                     pluginList = grid.sortByLoadOrder(pluginList, plugins);
 
                     pluginList.forEach(function(key) {
-                        console.info("Initing extension " + key);
+                        console.info('Initing extension ' + key);
                         var p = plugins[key];
                         if(typeof p === 'function') {
                             p(grid, grid.options.extensions[key]);
@@ -116,41 +113,42 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
         },
 
         loadExtensions: function(callback, keys, plugins, pluginList) {
-            var grid = this;
+            const grid = this;
             if(arguments.length < 4) {
                 keys = Object.keys(this.options.extensions),
                 plugins = {};
                 pluginList = [];
             }
-            var files = keys.map(function(e) { return "./extensions/" + e; });
-            require(files, function() {
-                var newkeys = [];
-                for(var x = 0; x < arguments.length; x++) {
-                    plugins[keys[x]] = arguments[x];
-                    pluginList.push(keys[x]);
 
-                    var reqs = arguments[x].requires;
-                    if(reqs) {
-                        for(var req in reqs) {
-                            if(!grid.options.extensions[req]) {
-                                newkeys.push(req);
-                            }
+            const reqCtx = require.context('./extensions');
 
-                            if(grid.options.extensions[req]) {
-                                $.extend(true, grid.options.extensions[req], reqs[req]);
-                            } else {
-                                grid.options.extensions[req] = reqs[req];
-                            }
-                        }
+            const newkeys = [];
+            keys.forEach((k) => {
+              let plugin = reqCtx('./' + k);
+              plugins[k] = plugin;
+              pluginList.push(k);
+
+              let reqs = plugin.requires;
+              if(reqs) {
+                for(var req in reqs) {
+                    if(!grid.options.extensions[req]) {
+                        newkeys.push(req);
+                    }
+
+                    if(grid.options.extensions[req]) {
+                        $.extend(true, grid.options.extensions[req], reqs[req]);
+                    } else {
+                        grid.options.extensions[req] = reqs[req];
                     }
                 }
-
-                if(newkeys.length) {
-                    grid.loadExtensions(callback, newkeys, plugins, pluginList);
-                } else {
-                    callback(pluginList, plugins);
-                }
+              }
             });
+
+            if(newkeys.length) {
+                grid.loadExtensions(callback, newkeys, plugins, pluginList);
+            } else {
+                callback(pluginList, plugins);
+            }
         },
 
         sortByLoadOrder: function(pluginList, plugins) {
@@ -177,24 +175,24 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
 
         init: function init() {
             var grid = this;
-            var baseSelector = this.baseSelector = "#" + this.target.attr('id'),
+            var baseSelector = this.baseSelector = '#' + this.target.attr('id'),
 
-                container = this.container = $("<div class='powergrid'>"),
-                columnheadercontainer = this.columnheadercontainer = $("<div class='pg-columnheaders'>"),
-                headercontainer = this.headercontainer = this.options.frozenRowsTop && $("<div class='pg-rowgroup pg-header'>") || undefined,
-                scrollingcontainer = this.scrollingcontainer = $("<div class='pg-rowgroup pg-scrolling'>"),
-                footercontainer = this.footercontainer = this.options.frozenRowsBottom && $("<div class='pg-rowgroup pg-footer'>") || undefined,
-                scroller = this.scroller = $("<div class='pg-scroller'>"),
-                scrollFiller = this.scrollFiller = $("<div class='pg-scroller-filler'>"),
+                container = this.container = $('<div class=\'powergrid\'>'),
+                columnheadercontainer = this.columnheadercontainer = $('<div class=\'pg-columnheaders\'>'),
+                headercontainer = this.headercontainer = this.options.frozenRowsTop && $('<div class=\'pg-rowgroup pg-header\'>') || undefined,
+                scrollingcontainer = this.scrollingcontainer = $('<div class=\'pg-rowgroup pg-scrolling\'>'),
+                footercontainer = this.footercontainer = this.options.frozenRowsBottom && $('<div class=\'pg-rowgroup pg-footer\'>') || undefined,
+                scroller = this.scroller = $('<div class=\'pg-scroller\'>'),
+                scrollFiller = this.scrollFiller = $('<div class=\'pg-scroller-filler\'>'),
 
                 scrollContainers = this.scrollContainers = ($().add(scrollingcontainer).add(headercontainer).add(footercontainer));
 
             if(this.options.fullWidth) {
-                container.addClass("pg-full-width");
+                container.addClass('pg-full-width');
             }
 
             if(this.options.autoResize) {
-                container.addClass("pg-autoresize");
+                container.addClass('pg-autoresize');
             }
 
             this.options.columns.forEach(function(column, index) {
@@ -238,7 +236,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                 this.initLoadingIndicator();
             }
 
-            $(this.dataSource).on("dataloaded", function(event) {
+            $(this.dataSource).on('dataloaded', function(event) {
                 if(!grid.isInited) {
                     grid.isInited = true;
                     grid.trigger('inited', grid);
@@ -253,7 +251,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                         $(grid.target).removeClass('pg-loading');
                     });
                 });
-            }).on("rowsremoved", function(event, data) {
+            }).on('rowsremoved', function(event, data) {
                 utils.inAnimationFrame(function() {
                     grid._removeRows(data.start, data.end);
 
@@ -264,7 +262,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                         grid.trigger('viewchanged');
                     });
                 });
-            }).on("rowsadded", function(event, data) {
+            }).on('rowsadded', function(event, data) {
                 utils.inAnimationFrame(function() {
                     grid._addRows(data.start, data.end);
 
@@ -276,7 +274,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                         grid.trigger('viewchanged');
                     });
                 });
-            }).on("datachanged", function(event, data) {
+            }).on('datachanged', function(event, data) {
                 utils.inAnimationFrame(function() {
                     if(data.data) {
                         grid._dataChanged(data.data, data.oldData);
@@ -304,7 +302,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
 
         initScrollEvents: function initScrollEvents() {
             var self = this;
-            this.target.on("wheel", function(evt) {
+            this.target.on('wheel', function(evt) {
                 var dX = evt.originalEvent.deltaX, dY = evt.originalEvent.deltaY, dM = evt.originalEvent.deltaMode, ddX, ddY;
                 switch(dM) {
                     case 0: ddX=ddY=1; break;
@@ -365,16 +363,16 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                         // request next frame.
                         requestAnimationFrame(draw);
                     }
-                };
+                }
 
                 utils.inAnimationFrame(draw);
             }
 
-            this.target.on("touchstart", function(startevent) {
+            this.target.on('touchstart', function(startevent) {
                 // user touches screen, so we may have to start scrolling
                 tracking = true;
                 lastX = startevent.originalEvent.touches[0].pageX, lastY = startevent.originalEvent.touches[0].pageY;
-            }).on("touchmove", function(dragevent) {
+            }).on('touchmove', function(dragevent) {
                 if(tracking) { // probably a pointless test since we shouldn't be getting a touchmove event unless we got a touchstart first anyway, but still
                     var newX = dragevent.originalEvent.touches[0].pageX, newY = dragevent.originalEvent.touches[0].pageY;
 
@@ -396,7 +394,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
 
                     dragevent.preventDefault();
                 }
-            }).on("touchend", function(endevent) {
+            }).on('touchend', function(endevent) {
                 tracking = false;
 
                 if(!eventQueue.length) return;
@@ -419,9 +417,9 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
         },
 
         createRowGroup: function createRowGroup(container, adddummies) {
-            var fixedPartLeft = this.options.frozenColumnsLeft > 0 && $("<div class='pg-container pg-fixed pg-left'>");
-            var fixedPartRight = this.options.frozenColumnsRight > 0 && $("<div class='pg-container pg-fixed pg-right'>");
-            var scrollingPart = $("<div class='pg-container pg-scrolling'>");
+            var fixedPartLeft = this.options.frozenColumnsLeft > 0 && $('<div class=\'pg-container pg-fixed pg-left\'>');
+            var fixedPartRight = this.options.frozenColumnsRight > 0 && $('<div class=\'pg-container pg-fixed pg-right\'>');
+            var scrollingPart = $('<div class=\'pg-container pg-scrolling\'>');
 
             this.fixedLeft = this.fixedLeft.add(fixedPartLeft);
             this.fixedRight = this.fixedRight.add(fixedPartRight);
@@ -431,7 +429,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
 
             if(adddummies) {
                 fixedPartLeft.add(scrollingPart).add(fixedPartRight).each(function(i, part) {
-                    $(part).append("<div class='.pg-dummyLead'>").append("<div class='.pg-dummyTail'>");
+                    $(part).append('<div class=\'.pg-dummyLead\'>').append('<div class=\'.pg-dummyTail\'>');
                 });
             }
 
@@ -460,28 +458,28 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                 end: 0
             });
 
-            this._renderDataErrorMessage = '';            
-            
+            this._renderDataErrorMessage = '';
+
             this.headergroup && this.renderRowGroupContents(0, this.options.frozenRowsTop, this.headergroup);
             this.footergroup && this.renderRowGroupContents(this.dataSource.recordCount() - this.options.frozenRowsBottom, this.dataSource.recordCount(), this.footergroup);
-            
-            if ( typeof this._renderDataErrorMessage !== "undefined" && this._renderDataErrorMessage ) {
+
+            if ( typeof this._renderDataErrorMessage !== 'undefined' && this._renderDataErrorMessage ) {
                 $.msgbox(i18n(this._renderDataErrorMessage), { type:'error', buttons : [{type: 'submit', value: i18n('close')}] });
                 this._renderDataErrorMessage = '';
             }
-            
+
             this.queueUpdateViewport();
             this.queueAdjustHeights();
             //this.queueSyncScroll();
             this.queueAfterRender(function() {
-                this.trigger("datarendered");
+                this.trigger('datarendered');
             });
         },
 
         renderColumnHeaderContents: function(rowgroup) {
-            var rowFixedPartLeft = rowgroup.left && $("<div class='pg-row pg-fixed'>"),
-                rowScrollingPart = rowgroup.scrolling && $("<div class='pg-row pg-scrolling'>"),
-                rowFixedPartRight = rowgroup.right && $("<div class='pg-row pg-fixed'>"),
+            var rowFixedPartLeft = rowgroup.left && $('<div class=\'pg-row pg-fixed\'>'),
+                rowScrollingPart = rowgroup.scrolling && $('<div class=\'pg-row pg-scrolling\'>'),
+                rowFixedPartRight = rowgroup.right && $('<div class=\'pg-row pg-fixed\'>'),
                 rowParts = $();
 
             if(rowgroup.left) rowgroup.left.append(rowFixedPartLeft);
@@ -496,8 +494,8 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                 var cell, column = this.options.columns[y];
                 cell = this.renderHeaderCell(column, y);
 
-                cell.addClass("pg-column" + this.normalizeCssClass(column.key));
-                cell.attr("data-column-key", column.key);
+                cell.addClass('pg-column' + this.normalizeCssClass(column.key));
+                cell.attr('data-column-key', column.key);
 
                 if(y < this.options.frozenColumnsLeft) {
                     rowFixedPartLeft.append(cell);
@@ -510,8 +508,8 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
         },
 
         rowGroupTemplates: {
-            fixed: elementWithClasses("div", "pg-row pg-fixed"),
-            scrolling: elementWithClasses("div", "pg-row pg-scrolling")
+            fixed: elementWithClasses('div', 'pg-row pg-fixed'),
+            scrolling: elementWithClasses('div', 'pg-row pg-scrolling')
         },
 
         renderRowGroupContents: function(start, end, rowgroup, prepend, atIndex) {
@@ -534,9 +532,9 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                 targetMiddle = rowgroup.scrolling;
                 targetRight = rowgroup.right;
             } else {
-                targetLeft = rowgroup.left && rowgroup.left.children(".pg-row:eq(" + atIndex + ")");
-                targetMiddle = rowgroup.scrolling && rowgroup.scrolling.children(".pg-row:eq(" + atIndex + ")");
-                targetRight = rowgroup.right && rowgroup.right.children(".pg-row:eq(" + atIndex + ")");
+                targetLeft = rowgroup.left && rowgroup.left.children('.pg-row:eq(' + atIndex + ')');
+                targetMiddle = rowgroup.scrolling && rowgroup.scrolling.children('.pg-row:eq(' + atIndex + ')');
+                targetRight = rowgroup.right && rowgroup.right.children('.pg-row:eq(' + atIndex + ')');
             }
 
             var fragmentLeft = targetLeft && document.createDocumentFragment(),
@@ -559,9 +557,9 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                 this.afterRenderRow(record, x, rowParts);
 
                 rowParts.forEach(function(e) {
-                    e.setAttribute("data-row-idx", x);
-                    e.setAttribute("data-row-id", record.id);
-                    e.style.height = self.rowHeight(x) + "px";
+                    e.setAttribute('data-row-idx', x);
+                    e.setAttribute('data-row-id', record.id);
+                    e.style.height = self.rowHeight(x) + 'px';
                 });
 
                 if(fragmentLeft)   fragmentLeft.appendChild(rowFixedPartLeft);
@@ -580,8 +578,8 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                 cell = this.renderCell(record, column, rowIdx, y);
                 this.afterCellRendered(record, column, cell);
 
-                cell.className += " pg-column" + this.normalizeCssClass(column.key);
-                cell.setAttribute("data-column-key", column.key);
+                cell.className += ' pg-column' + this.normalizeCssClass(column.key);
+                cell.setAttribute('data-column-key', column.key);
 
                 if(y < this.options.frozenColumnsLeft) {
                     rowFixedPartLeft.appendChild(cell);
@@ -597,13 +595,13 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
         },
 
         _removeRows: function(start, end) {
-            console.log("Removing rows " +start + " to " + end);
+            console.log('Removing rows ' +start + ' to ' + end);
             function r(start, end, rowgroup) {
-                var selector = ".pg-row:lt(" + end + ")";
+                var selector = '.pg-row:lt(' + end + ')';
                 if(start > 0) {
-                    selector += ":gt(" + (start-1) + ")";
+                    selector += ':gt(' + (start-1) + ')';
                 }
-                rowgroup.children(".pg-container").each(function(i,part) {
+                rowgroup.children('.pg-container').each(function(i,part) {
                     $(part).children(selector).remove();
                 });
                 return end-start;
@@ -659,7 +657,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
             var range = this.viewRange();
 
             if(start >= this.viewport.begin && start <= this.viewport.end) {
-                console.log("Adding rows " + start + " to " + end);
+                console.log('Adding rows ' + start + ' to ' + end);
                 // new rows being added to the virtual scrolling container, so that means:
                 // a) insert some rows between two existing rows
                 // b) remove the rows that are no longer in the viewport
@@ -743,7 +741,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                 end = this.dataSource.recordCount() - this.options.frozenRowsBottom,
                 group = this.scrollinggroup,
                 allParts = group.all;
-                
+
             if(!this.viewport || range.begin != this.viewport.begin || range.end != this.viewport.end) {
                 var leadingHeight = this.rowHeight(start, range.begin),
                     trailingHeight = this.rowHeight(range.end, end);
@@ -806,7 +804,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                 if(temporary === false) {
                     // means we explicitely invoke this after temporary changes, so reset the temporary changes first
                     var reset = {};
-                    Object.keys(style).forEach(function(key) { reset[key] = ""; });
+                    Object.keys(style).forEach(function(key) { reset[key] = ''; });
                     $(selector).css(reset);
                 }
                 vein.inject(selector, style);
@@ -820,24 +818,24 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                 var column = columns[x];
                 var w = this.columnWidth(x);
                 if(this.options.fullWidth  && (x == this.options.columns.length - this.options.frozenColumnsRight  - 1)) {
-                    this._updateStyle(temporary, this.baseSelector + " .pg-column" + this.normalizeCssClass(column.key), {"width": "auto", "min-width": w + "px", "right": "0"});
+                    this._updateStyle(temporary, this.baseSelector + ' .pg-column' + this.normalizeCssClass(column.key), {'width': 'auto', 'min-width': w + 'px', 'right': '0'});
                 } else {
-                    this._updateStyle(temporary, this.baseSelector + " .pg-column" + this.normalizeCssClass(column.key), {"width": w + "px", "right": "auto"});
+                    this._updateStyle(temporary, this.baseSelector + ' .pg-column' + this.normalizeCssClass(column.key), {'width': w + 'px', 'right': 'auto'});
                 }
             }
 
             var leadingWidth = this.columnWidth(0, this.options.frozenColumnsLeft);
             var middleWidth = this.columnWidth(this.options.frozenColumnsLeft, this.options.columns.length - this.options.frozenColumnsRight);
             var trailingWidth = this.columnWidth(this.options.columns.length - this.options.frozenColumnsRight, this.options.columns.length);
-            this.fixedLeft.css("width", leadingWidth + "px");
-            this.fixedRight.css("width", trailingWidth + "px");
-            this.columnheadergroup.right && this.columnheadergroup.right.css("width", (trailingWidth + scrollBarSize.width) + "px");
+            this.fixedLeft.css('width', leadingWidth + 'px');
+            this.fixedRight.css('width', trailingWidth + 'px');
+            this.columnheadergroup.right && this.columnheadergroup.right.css('width', (trailingWidth + scrollBarSize.width) + 'px');
             var minWidth = 'calc(100% - ' + leadingWidth +'px - ' + trailingWidth + 'px)';
-            this.middleScrollers.css({"left": leadingWidth + "px", "width": middleWidth + "px", "min-width":  minWidth});
-            this.scrollFiller.css({"width": (leadingWidth + middleWidth + trailingWidth + this.scroller.width() - this.scrollingcontainer.width()) + "px"});
+            this.middleScrollers.css({'left': leadingWidth + 'px', 'width': middleWidth + 'px', 'min-width':  minWidth});
+            this.scrollFiller.css({'width': (leadingWidth + middleWidth + trailingWidth + this.scroller.width() - this.scrollingcontainer.width()) + 'px'});
 
             if(this.options.autoResize) {
-                this.container.css({"width": (this.columnWidth(0, this.options.columns.length)) + "px" });
+                this.container.css({'width': (this.columnWidth(0, this.options.columns.length)) + 'px' });
             }
         },
 
@@ -846,19 +844,19 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
             var columnHeaderHeight = this.headerContainerHeight();
             var headerHeight = this.rowHeight(0, this.options.frozenRowsTop);
             var footerHeight = this.rowHeight(this.dataSource.recordCount() - this.options.frozenRowsBottom, this.dataSource.recordCount());
-            this.columnheadercontainer.css("height", (columnHeaderHeight) + "px");
-            this.columnheadergroup.all.css("height", (this.headerHeight()) + "px");
+            this.columnheadercontainer.css('height', (columnHeaderHeight) + 'px');
+            this.columnheadergroup.all.css('height', (this.headerHeight()) + 'px');
 
-            this.headercontainer && this.headercontainer.css("height", (headerHeight) + "px").css("top", (columnHeaderHeight) + "px");
-            this.footercontainer && this.footercontainer.css("height", (footerHeight) + "px");
+            this.headercontainer && this.headercontainer.css('height', (headerHeight) + 'px').css('top', (columnHeaderHeight) + 'px');
+            this.footercontainer && this.footercontainer.css('height', (footerHeight) + 'px');
 
-            this.scrollingcontainer.css("top", (columnHeaderHeight + headerHeight) + "px").css("bottom", (footerHeight + (this.options.autoResize ? 0 : scrollBarSize.height)) + "px");
+            this.scrollingcontainer.css('top', (columnHeaderHeight + headerHeight) + 'px').css('bottom', (footerHeight + (this.options.autoResize ? 0 : scrollBarSize.height)) + 'px');
 
-            this.scroller.css("top", columnHeaderHeight + "px");
-            this.scrollFiller.css({"height": this.rowHeight(0, this.dataSource.recordCount()) + this.scroller.height() - this.scrollingcontainer.height() });
+            this.scroller.css('top', columnHeaderHeight + 'px');
+            this.scrollFiller.css({'height': this.rowHeight(0, this.dataSource.recordCount()) + this.scroller.height() - this.scrollingcontainer.height() });
 
             if(this.options.autoResize) {
-                this.container.css({"height": (this.rowHeight(0, this.dataSource.recordCount()) + columnHeaderHeight) + "px"});
+                this.container.css({'height': (this.rowHeight(0, this.dataSource.recordCount()) + columnHeaderHeight) + 'px'});
             }
         },
 
@@ -867,7 +865,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
         },
 
         headerHeight: function headerHeight() {
-            return Math.max.apply(undefined, this.target.find(".pg-columnheader span").map(function(i, e) {
+            return Math.max.apply(undefined, this.target.find('.pg-columnheader span').map(function(i, e) {
                 return $(e).outerHeight();
             }));
         },
@@ -883,7 +881,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
                     pos = 0;
                 }
                 positions[x] = pos;
-                this._updateStyle(temporary, this.baseSelector + " .pg-column" + this.normalizeCssClass(column.key), {left: pos + "px"});
+                this._updateStyle(temporary, this.baseSelector + ' .pg-column' + this.normalizeCssClass(column.key), {left: pos + 'px'});
                 column.offsetLeft = pos;
 
                 pos += this.columnWidth(x);
@@ -1067,11 +1065,11 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
 
         renderHeaderCell: function renderHeaderCell(column, columnIdx) {
             // Render the cell for the header
-            return $("<div class='pg-columnheader'>").append($("<span>").text(column.title));
+            return $('<div class=\'pg-columnheader\'>').append($('<span>').text(column.title));
         },
 
         renderCellTemplate: (function() {
-            var el = document.createElement("div");
+            var el = document.createElement('div');
             el.className = 'pg-cell';
             return el;
         })(),
@@ -1100,7 +1098,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
 
         updateCellValue: function(rowId, key) {
             var row = this.findRow(rowId);
-            var cell = row.children(".pg-cell[data-column-key='" + key + "']");
+            var cell = row.children('.pg-cell[data-column-key=\'' + key + '\']');
             if(cell.length) {
                 var record = this.dataSource.getRecordById(rowId),
                     column = this.getColumnForKey(key);
@@ -1114,11 +1112,11 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
         },
 
         findRow: function(rowId) {
-            return this.container.find("> .pg-rowgroup > .pg-container > .pg-row[data-row-id='" + rowId + "']");
+            return this.container.find('> .pg-rowgroup > .pg-container > .pg-row[data-row-id=\'' + rowId + '\']');
         },
 
         cellValueTemplate: (function() {
-            var el = document.createElement("span");
+            var el = document.createElement('span');
             return el;
         })(),
 
@@ -1157,7 +1155,7 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
         },
 
         getCellFor: function(rowId, key) {
-            return this.container.find(".pg-row[data-row-id='" + rowId + "'] > .pg-cell[data-column-key='" + key + "']");
+            return this.container.find('.pg-row[data-row-id=\'' + rowId + '\'] > .pg-cell[data-column-key=\'' + key + '\']');
         },
 
         trigger: function(eventName, data) {
@@ -1240,11 +1238,11 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
             return diff;
         },
         saveSetting: function (id, value) {
-            localStorage[this.options.settingsId + "_" + id] = JSON.stringify(value);
+            localStorage[this.options.settingsId + '_' + id] = JSON.stringify(value);
         },
 
         loadSetting: function(id) {
-            var s = localStorage[this.options.settingsId + "_" + id];
+            var s = localStorage[this.options.settingsId + '_' + id];
             if (s) {
                 return JSON.parse(s);
             }
@@ -1259,12 +1257,12 @@ define(['./jquery', 'vein', './utils', './promise', 'require'], function($, vein
     };
 
     $.fn.extend({ PowerGrid: function(options) {
-        var d = this.data("powergrid");
+        var d = this.data('powergrid');
 
         if(options) {
             if(d) d.destroy();
             d = new PowerGrid(this, options);
-            this.data("powergrid", d);
+            this.data('powergrid', d);
         }
 
         return d;

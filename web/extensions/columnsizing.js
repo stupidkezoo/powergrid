@@ -1,7 +1,7 @@
-define(['../override', '../utils', '../jquery'], function(override, utils, $) {
-    
-    "use strict";
-    
+define(['../override', '../utils', 'jquery'], function(override, utils, $) {
+
+    'use strict';
+
     return {
         loadFirst: ['filtering'],
         init: function(grid, pluginOptions) {
@@ -9,7 +9,7 @@ define(['../override', '../utils', '../jquery'], function(override, utils, $) {
                 return {
                     renderHeaderCell: function() {
                         var h = $super.renderHeaderCell.apply(this, arguments);
-                        var handle = $("<div class='pg-resizehandle'></div>");
+                        var handle = $('<div class=\'pg-resizehandle\'></div>');
                         h.append(handle);
                         return h;
                     },
@@ -17,8 +17,8 @@ define(['../override', '../utils', '../jquery'], function(override, utils, $) {
                     init: function() {
                         for (var x = 0, l = this.options.columns.length; x < l; x++) {
                             var column = this.options.columns[x];
-                            var width = this.loadSetting(column.key + "_width");
-                            if (width !== undefined && width !== null && width !== "") {
+                            var width = this.loadSetting(column.key + '_width');
+                            if (width !== undefined && width !== null && width !== '') {
                                 column.width = width;
                             }
                         }
@@ -29,14 +29,14 @@ define(['../override', '../utils', '../jquery'], function(override, utils, $) {
                         function startResize(event) {
                             if($(this).parents('.powergrid')[0] !== grid.container[0]) return;
                             header = event.target.parentNode;
-                            key = $(header).attr("data-column-key");
+                            key = $(header).attr('data-column-key');
                             idx = utils.findInArray(grid.options.columns, function(col) { return col.key == key; });
                             col = grid.options.columns[idx];
-                            
+
                             if(col.resizable === false) {
                                 return;
                             }
-                            
+
                             oX = event.pageX;
                             w = col.width;
 
@@ -66,7 +66,7 @@ define(['../override', '../utils', '../jquery'], function(override, utils, $) {
                         function endResize(event) {
                             if(resizing !== 0) {
                                 resizing = 0;
-                                grid.saveSetting(col.key + "_width", col.width);
+                                grid.saveSetting(col.key + '_width', col.width);
                                 event.preventDefault();
                                 event.stopImmediatePropagation();
                                 requestAnimationFrame(function() {
@@ -76,10 +76,10 @@ define(['../override', '../utils', '../jquery'], function(override, utils, $) {
                         }
 
                         this.container
-                            .on("mousedown", ".pg-resizehandle", startResize)
-                            .on("mousemove", doResize)
-                            .on("mouseup", ":not(.pg-resizehandle)", endResize)
-                            .on("click", ".pg-resizehandle", function(event) {
+                            .on('mousedown', '.pg-resizehandle', startResize)
+                            .on('mousemove', doResize)
+                            .on('mouseup', ':not(.pg-resizehandle)', endResize)
+                            .on('click', '.pg-resizehandle', function(event) {
                                 event.stopImmediatePropagation();
                                 event.preventDefault();
                                 event.stopPropagation();
@@ -89,5 +89,5 @@ define(['../override', '../utils', '../jquery'], function(override, utils, $) {
             });
         }
     };
-    
+
 });
