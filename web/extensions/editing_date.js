@@ -7,9 +7,9 @@
  *  - currencyPrecision
  */
 
-define(['override', 'jquery', 'utils', 'w2ui'], function(override, $) {
+define(['../override', 'jquery', '../utils', 'w2ui'], function(override, $) {
 
-    "use strict";
+    'use strict';
     return {
         requires: {
             editing: true
@@ -21,7 +21,7 @@ define(['override', 'jquery', 'utils', 'w2ui'], function(override, $) {
                     createEditor: function(record, column, value) {
                         if(column.type=='date') {
                             var committed = false;
-                            var input = $("<input>").datepicker({
+                            var input = $('<input>').datepicker({
                                 dateFormat: column.format,
                                 onSelect: function(value, obj) {
                                     committed = true;

@@ -1,6 +1,6 @@
 (function(define) {
-    "use strict";
-    
+    'use strict';
+
     var animFrameQueue = [], inAnimFrame = false, animFrameRequested = false;
 
     var pathRegex = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]/g;
@@ -40,8 +40,8 @@
         }
         o[p[x]] = value;
     }
-    
-    define(['./jquery'], function($) {
+
+    define(['jquery'], function($) {
         return {
             inAnimationFrame: function(f, queue) {
                 if(inAnimFrame && !queue) {
@@ -66,11 +66,11 @@
                     animFrameRequested = false;
                 }
             },
-            
+
             handleEventInAnimationFrame: function (event) {
                 var self = this, args = arguments;
                 requestAnimationFrame(function() {
-                    event.data.apply(self, args);;
+                    event.data.apply(self, args);
                 });
             },
 
@@ -90,14 +90,14 @@
                     }
                 }
             },
-            
+
             loggingInterceptor: function(callback) {
                 var args = Array.prototype.slice.apply(arguments, [1]);
                 var r = callback.apply(this, args);
-                console.log(args.map(function(e) { return e }).join(",") + " -> " + r);
+                console.log(args.map(function(e) { return e }).join(',') + ' -> ' + r);
                 return r;
             },
-            
+
             cancelEvent: function(event) {
                 event.stopPropagation();
                 event.stopImmediatePropagation();

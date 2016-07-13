@@ -13,8 +13,8 @@
  *
  */
 
-define(['../override', '../jquery', 'jsrender/jsrender'], function(override, $, jsrender) {
-    "use strict";
+define(['../override', 'jquery', 'jsrender/jsrender'], function(override, $, jsrender) {
+    'use strict';
 
     return function(grid, pluginOptions) {
         override(grid, function($super) {
@@ -33,7 +33,7 @@ define(['../override', '../jquery', 'jsrender/jsrender'], function(override, $, 
                     if (column.template !== undefined && column.template !== null) {
                         var data = $.extend({}, record);
                         data[column.key] = value;
-                        var element = document.createElement("span");
+                        var element = document.createElement('span');
                         element.innerHTML = column.compiledTemplate.render(data, {record: record, column: column});
                         return element;
                     } else {

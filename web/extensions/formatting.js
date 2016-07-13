@@ -16,15 +16,15 @@
  *   - format: Column specific options for the formatter
  *
  */
-define(['../override', '../jquery', '../utils'], function(override, $) {
-    "use strict";
+define(['../override', 'jquery', '../utils'], function(override, $) {
+    'use strict';
 
     return function(grid, pluginOptions) {
         override(grid, function($super) {
             return {
                 getCellTextValue: function (value, record, column) {
                     var formatter = column.formatter;
-                    if (typeof column.formatter === "string") {
+                    if (typeof column.formatter === 'string') {
                         formatter = pluginOptions[column.formatter];
                     }
 
