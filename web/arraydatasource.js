@@ -1,6 +1,6 @@
-define(["./jquery", "./utils"], function($, utils) {
-    "use strict";
-    
+define(['jquery', './utils'], function($, utils) {
+    'use strict';
+
     function ArrayDataSource(data, delay) {
         this.data = data;
         if(delay) {
@@ -9,7 +9,7 @@ define(["./jquery", "./utils"], function($, utils) {
             this.load();
         }
     }
-    
+
     ArrayDataSource.prototype = {
         load: function(data) {
             if(data !== undefined) {
@@ -22,10 +22,10 @@ define(["./jquery", "./utils"], function($, utils) {
                 }
             }
 
-            $(this).trigger("dataloaded");
+            $(this).trigger('dataloaded');
             this.ready = true;
         },
-        
+
         recordCount: function() {
             this.assertReady();
             return this.data.length;
@@ -54,13 +54,13 @@ define(["./jquery", "./utils"], function($, utils) {
         setValue: function(rowId, key, value) {
             this.assertReady();
             utils.setValue(this.getRecordById(rowId), key, value);
-            $(this).trigger("datachanged", { values: [ { id: rowId, key: key } ] });
+            $(this).trigger('datachanged', { values: [ { id: rowId, key: key } ] });
         },
 
         assertReady: function() {
-            if(!this.isReady()) throw Error("Datasource not ready yet");
+            if(!this.isReady()) throw Error('Datasource not ready yet');
         },
-        
+
         isReady: function() {
             return this.ready;
         },
@@ -68,9 +68,9 @@ define(["./jquery", "./utils"], function($, utils) {
         sort: function(comparator) {
             this.assertReady();
             this.data.sort(comparator);
-            $(this).trigger("dataloaded");
+            $(this).trigger('dataloaded');
         }
     };
-    
+
     return ArrayDataSource;
 });

@@ -4,18 +4,18 @@
  * Generates a simple html select / option list
  */
 
-define(['../override', '../jquery', '../utils'], function(override, $) {
+define(['../override', 'jquery', '../utils'], function(override, $) {
 
-    "use strict";
+    'use strict';
 
     return {
         requires: {
             editing: {
                 editors: {
                     option: function(record, column, value) {
-                        var select = $("<select>");
+                        var select = $('<select>');
                         var optionElement =  $('<option>');
-                        optionElement.text("");
+                        optionElement.text('');
                         optionElement.value(null);
                         select.append(optionElement);
                         for (var i = 0; i < column.options.length; i++) {

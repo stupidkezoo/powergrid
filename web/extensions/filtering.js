@@ -1,20 +1,20 @@
-define(['../override', '../jquery', '../utils',
-    '../templates/filterPane.html!text',
-    '../templates/filterBox.html!text'], function(override, $, utils, filterPane, filterBox) {
-    "use strict";
-    
+define(['../override', 'jquery', '../utils',
+    '../templates/filterPane.html',
+    '../templates/filterBox.html'], function(override, $, utils, filterPane, filterBox) {
+    'use strict';
+
     function FilteringDataSource(delegate) {
         var self = this;
         this.delegate = delegate;
-        
-        $(delegate).on("dataloaded", function(event) {
+
+        $(delegate).on('dataloaded', function(event) {
             self.reload();
-            $(self).trigger("dataloaded");
-        }).on("datachanged", function(event, data) {
+            $(self).trigger('dataloaded');
+        }).on('datachanged', function(event, data) {
             self.reload();
-            $(self).trigger("datachanged", [data]);
+            $(self).trigger('datachanged', [data]);
         });
-        
+
         if(delegate.isReady()) {
             this.reload();
         }
@@ -23,24 +23,24 @@ define(['../override', '../jquery', '../utils',
             this.sort = delegate.sort.bind(delegate);
         }
     }
-    
+
     FilteringDataSource.prototype = {
         view: null,
-        
+
         isReady: function() {
             return this.view != null;
         },
-        
+
         reload: function() {
             this.delegate.assertReady();
             this.view = this.delegate.getData();
         },
-        
+
         recordCount: function() {
             this.assertReady();
             return this.view.length;
         },
-        
+
         getData: function(start, end) {
             this.assertReady();
             if(!start && !end) return this.view;
@@ -52,17 +52,17 @@ define(['../override', '../jquery', '../utils',
         setValue: function(rowId, key, value) {
             this.delegate.setValue(rowId, key, value);
         },
-        
+
         assertReady: function() {
-            if(!this.isReady()) throw Error("Datasource not ready yet");
+            if(!this.isReady()) throw Error('Datasource not ready yet');
         },
-        
+
         buildStatistics: function() {
             return {
                 actualRecordCount: this.delegate && this.delegate.recordCount()
             };
         },
-        
+
         applyFilter: function(settings, filter) {
             var oldview = this.view,
                 view = this.delegate.getData().filter(filter);
@@ -74,70 +74,70 @@ define(['../override', '../jquery', '../utils',
             return this.delegate.getRecordById(id);
         }
     };
-    
+
     return {
         init: function(grid, pluginOptions) {
             return override(grid, function($super) {
                 var columnSettings = {};
-                
+
                 var currentFilterPane;
-                
+
                 return {
                     init: function() {
                         if(typeof this.dataSource.applyFilter !== 'function') {
                             this.dataSource = new FilteringDataSource(this.dataSource);
                         }
-                        
+
                         $super.init();
-                        
-                        this.container.on("click", ".pg-filter", function(event) {
+
+                        this.container.on('click', '.pg-filter', function(event) {
                             var $this = $(this),
                                 key = $this.parents('.pg-columnheader').attr('data-column-key'),
                                 column = grid.getColumnForKey(key);
-                            
+
                             if(currentFilterPane) {
                                 grid.filtering.closeFilterPane();
                             }
-                            
-                            currentFilterPane = $("<div class='pg-filter-pane'>");
+
+                            currentFilterPane = $('<div class=\'pg-filter-pane\'>');
                             grid.filtering.renderFilterPane(currentFilterPane, column);
-                            currentFilterPane.css("top", $this.offset().top + "px").css("left", $this.offset().left + "px");
-                            $("body").append(currentFilterPane);
-                            
+                            currentFilterPane.css('top', $this.offset().top + 'px').css('left', $this.offset().left + 'px');
+                            $('body').append(currentFilterPane);
+
                             event.preventDefault();
                             event.stopPropagation();
                         });
-                        
-                        $("body").on("click." + this.id, function(event) {
-                            if(currentFilterPane && $(this).parents(".pg-filter-pane").empty()) {
+
+                        $('body').on('click.' + this.id, function(event) {
+                            if(currentFilterPane && $(this).parents('.pg-filter-pane').empty()) {
                                 grid.filtering.closeFilterPane();
                             }
                         });
-                        
-                        this.container.on("click mousedown", ".pg-filter-box", function(event) {
+
+                        this.container.on('click mousedown', '.pg-filter-box', function(event) {
                             event.stopPropagation();
                         });
                     },
-                    
+
                     destroy: function() {
                         $super.destroy();
-                        $("body").off("click." + this.id);
+                        $('body').off('click.' + this.id);
                     },
 
                     renderHeaderCell: function(column, columnIdx) {
                         var header = $super.renderHeaderCell(column, columnIdx);
-                        
+
                         if(column.filterable === undefined || column.filterable) {
-                            header.addClass("pg-filterable");
+                            header.addClass('pg-filterable');
                             header.append(filterBox);
 
                             var timer;
-                            
-                            header.on("keyup", ".pg-filter-input", function(event) {
+
+                            header.on('keyup', '.pg-filter-input', function(event) {
                                 var self = this;
                                 if(timer) clearTimeout(timer);
                                 timer = setTimeout(function() {
-                                    grid.filtering.setColumnFilteringAttribute(column.key, { "value": self.value });
+                                    grid.filtering.setColumnFilteringAttribute(column.key, { 'value': self.value });
                                     timer = null;
                                 }, 1000);
                             });
@@ -145,39 +145,39 @@ define(['../override', '../jquery', '../utils',
 
                         return header;
                     },
-                    
+
                     filterHeight: function() {
-                        return Math.max.apply(undefined, this.target.find(".pg-columnheader .pg-filter-box").map(function(i, e) {
+                        return Math.max.apply(undefined, this.target.find('.pg-columnheader .pg-filter-box').map(function(i, e) {
                             return $(e).outerHeight();
                         }));
                     },
-                    
+
                     headerHeight: function() {
                         return $super.headerHeight() + this.filterHeight();
                     },
-                    
+
                     filtering: {
                         renderFilterPane: function(container, column) {
                             container.html(filterPane);
-                            container.on("click", "[data-filter-method],[data-filter-type]", function(event) {
-                                grid.filtering.setColumnFilteringAttribute(column.key, 
+                            container.on('click', '[data-filter-method],[data-filter-type]', function(event) {
+                                grid.filtering.setColumnFilteringAttribute(column.key,
                                     {
-                                        method: $(this).attr("data-filter-method"),
-                                        type: $(this).attr("data-filter-type")
+                                        method: $(this).attr('data-filter-method'),
+                                        type: $(this).attr('data-filter-type')
                                     });
                                 grid.filtering.closeFilterPane();
                             });
                         },
-                        
+
                         closeFilterPane: function() {
                             currentFilterPane.remove();
                             currentFilterPane = null;
                         },
-                        
+
                         filter: function(settings) {
                             grid.dataSource.applyFilter(settings, settings && this.rowMatches.bind(this, settings));
                         },
-                        
+
                         rowMatches: function(settings, row) {
                             for(var x in settings) {
                                 if(!this.valueMatches(settings[x], utils.getValue(row, x))) {
@@ -192,26 +192,26 @@ define(['../override', '../jquery', '../utils',
                             }
                             return 1;
                         },
-                        
+
                         valueMatches: function(columnSetting, value) {
-                            var hasValue = value !== undefined && value !== null && value !== "";
+                            var hasValue = value !== undefined && value !== null && value !== '';
                             switch(columnSetting.method) {
-                                case "contains":
+                                case 'contains':
                                     return (!columnSetting.value || hasValue && (value.toLocaleUpperCase()).indexOf(columnSetting.value.toLocaleUpperCase()) > -1);
-                                case "beginsWith":
+                                case 'beginsWith':
                                     return (!columnSetting.value || hasValue && value.length >= columnSetting.value.length && value.substring(0, columnSetting.value.length).toLocaleUpperCase() == columnSetting.value.toLocaleUpperCase());
-                                case "endsWith":
+                                case 'endsWith':
                                     return (!columnSetting.value || hasValue && value.length >= columnSetting.value.length && value.substring(value.length - columnSetting.value.length).toLocaleUpperCase() == columnSetting.value.toLocaleUpperCase());
-                                default: throw "Unsupported filter operator " + columnSetting.type;
+                                default: throw 'Unsupported filter operator ' + columnSetting.type;
                             }
                         },
-                        
+
                         setColumnFilteringAttribute: function(key, attributes) {
                             if(!columnSettings[key]) columnSettings[key] = this.createDefaultFiltering(key);
                             $.extend(columnSettings[key], attributes);
                             this.filter(columnSettings);
                         },
-                        
+
                         createDefaultFiltering: function(key) {
                             return { value: '', method: 'contains', type: 'inclusive' };
                         }
@@ -220,5 +220,5 @@ define(['../override', '../jquery', '../utils',
             });
         }
    };
-    
+
 });

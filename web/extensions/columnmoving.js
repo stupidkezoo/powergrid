@@ -1,6 +1,6 @@
-define(['../override', 'vein', '../utils'], function(override, vein, utils) {
-    "use strict";
-    
+define(['../override', 'veinjs', '../utils', 'jquery'], function(override, vein, utils, $) {
+    'use strict';
+
     function updateStyle(selector, style) {
         $(selector).css(style);
         //vein.inject(selector, style);
@@ -9,18 +9,18 @@ define(['../override', 'vein', '../utils'], function(override, vein, utils) {
     function storeColumnOrder(grid) {
         var result = {};
         grid.options.columns.map(function(current, index) {return result[current.key] = index});
-        grid.saveSetting("columnmoving", result);
+        grid.saveSetting('columnmoving', result);
     }
 
     function loadColumnOrder(grid) {
-        var keyIndexMap = grid.loadSetting("columnmoving");
-        if (keyIndexMap !== undefined && keyIndexMap !== null && keyIndexMap !== "") {
+        var keyIndexMap = grid.loadSetting('columnmoving');
+        if (keyIndexMap !== undefined && keyIndexMap !== null && keyIndexMap !== '') {
             grid.options.columns.sort(function(a, b) {
                     return (keyIndexMap[a.key] - keyIndexMap[b.key]);
             })
         }
     }
-    
+
     return {
         loadFirst: ['filtering'],
         requires: {
@@ -34,7 +34,7 @@ define(['../override', 'vein', '../utils'], function(override, vein, utils) {
                         var start, end, idx, oidx, startconfig, wasOutOfBounds;
                         loadColumnOrder(grid);
                         $super.init();
-                        grid.on("columndragstart", function (event) {
+                        grid.on('columndragstart', function (event) {
                             idx = event.idx;
                             oidx = idx;
 
@@ -51,7 +51,7 @@ define(['../override', 'vein', '../utils'], function(override, vein, utils) {
 
                             startconfig = $.extend([], grid.options.columns);
                             wasOutOfBounds = false;
-                        }).on("columndragmove", function (event, ui) {
+                        }).on('columndragmove', function (event, ui) {
                             if (event.outOfViewPort) {
                                 if (!wasOutOfBounds) {
                                     wasOutOfBounds = true;
@@ -80,7 +80,7 @@ define(['../override', 'vein', '../utils'], function(override, vein, utils) {
                                     storeColumnOrder(grid);
                                 }
                             }
-                        }).on("columndragend", function (event, ui) {
+                        }).on('columndragend', function (event, ui) {
                             startconfig = null;
                             grid.adjustColumnPositions(false);
                         });
