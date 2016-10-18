@@ -1,4 +1,4 @@
-define(['../override', 'veinjs', '../utils'], function(override, vein, utils) {
+define(['../override', 'veinjs', '../utils', 'jquery'], function(override, vein, utils, $) {
     'use strict';
 
     return function(grid, pluginOptions) {
