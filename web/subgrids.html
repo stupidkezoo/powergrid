@@ -47,6 +47,11 @@
                                 console.log(arguments);
                             }
                         },
+                        'cellSelection': {
+                            onCellSelected: function(event, position) {
+                                console.log(position);
+                            }
+                        },
                         'subgrids': {
                             hasSubGrid: function(record) {
                                 return true;
