@@ -3,11 +3,11 @@ define(['../override', 'jquery',], function(override, $) {
     /**
      * Simple usage
      *  cellSelection: {
+     *      highlightRow: true,
      *      onCellSelected: function(event, position) {
      *          // do something with position
      *      }
      *  }
-     *
      */
     return function(grid, pluginOptions) {
         override(grid, function($super) {
@@ -20,14 +20,26 @@ define(['../override', 'jquery',], function(override, $) {
                         var row = $(evt.currentTarget.parentNode).data('row-id');
                         var col = $(evt.currentTarget).data('column-key');
 
-                        grid.selection.selectCell({row, col});
+                        const highlightRow = pluginOptions.highlightRow && pluginOptions.highlightRow == true;
+
+                        grid.selection.selectRow({row, col, highlightRow});
                     });
 
                     if (pluginOptions.onCellSelected) grid.on('onCellSelected', pluginOptions.onCellSelected);
                 },
 
                 selection: {
-                    selectCell: function(position) {
+                    selectRow: function(position) {
+
+                        if (position.highlightRow) {
+                            if (this.selectedElements) {
+                                this.selectedElements.removeClass('pg-selected');
+                            }
+
+                            this.selectedElements = grid.container.find('> .pg-rowgroup > .pg-container > .pg-row[data-row-id=\'' + position.row + '\']');
+                            this.selectedElements.addClass('pg-selected');
+                        }
+
                         grid.trigger('onCellSelected', position);
                     }
                 }
