@@ -20,7 +20,7 @@ define(['../override', 'jquery',], function(override, $) {
                         var row = $(evt.currentTarget.parentNode).data('row-id');
                         var col = $(evt.currentTarget).data('column-key');
 
-                        const highlightRow = pluginOptions.highlightRow && pluginOptions.highlightRow == true;
+                        const highlightRow = pluginOptions.highlightRow === true;
 
                         grid.selection.selectRow({row, col, highlightRow});
                     });
