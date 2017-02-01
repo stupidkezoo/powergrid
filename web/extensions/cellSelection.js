@@ -18,11 +18,12 @@ define(['../override', 'jquery',], function(override, $) {
                     this.container.on('click', '.pg-cell', function(evt) {
 
                         var row = $(evt.currentTarget.parentNode).data('row-id');
+                        var idx = $(evt.currentTarget.parentNode).index();
                         var col = $(evt.currentTarget).data('column-key');
 
                         const highlightRow = pluginOptions.highlightRow === true;
 
-                        grid.selection.selectRow({row, col, highlightRow});
+                        grid.selection.selectRow({row, idx, col, highlightRow});
                     });
 
                     if (pluginOptions.onCellSelected) grid.on('onCellSelected', pluginOptions.onCellSelected);
