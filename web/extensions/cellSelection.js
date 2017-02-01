@@ -17,8 +17,9 @@ define(['../override', 'jquery',], function(override, $) {
 
                     this.container.on('click', '.pg-cell', function(evt) {
 
-                        var row = $(evt.currentTarget.parentNode).data('row-id');
-                        var idx = $(evt.currentTarget.parentNode).index();
+                        var $parentNode = $(evt.currentTarget.parentNode);
+                        var row = $parentNode.data('row-id');
+                        var idx = $parentNode.index() + grid.viewport.begin;
                         var col = $(evt.currentTarget).data('column-key');
 
                         const highlightRow = pluginOptions.highlightRow === true;
