@@ -17,7 +17,7 @@ define(['../override', 'jquery',], function(override, $) {
 
                     this.container.on('click', '.pg-cell', function(evt) {
 
-                        var $parentNode = $(evt.currentTarget.parentNode);
+                        var $parentNode = $(evt.currentTarget).closest('.pg-row');
                         var row = $parentNode.data('row-id');
                         var idx = $parentNode.index() + grid.viewport.begin;
                         var col = $(evt.currentTarget).data('column-key');
