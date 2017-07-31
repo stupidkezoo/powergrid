@@ -1,9 +1,9 @@
-define(['override', 'jquery'], function(override, $) {
+define(['../override', 'jquery'], function(override, $) {
     //TODO port enable/disable of buttons logic.
     //TODO Do we still need special handling for group action buttons?
     //TODO visibility formula??
 
-    
+
 
     return {
         loadFirst: ['directinput'],
@@ -165,7 +165,7 @@ define(['override', 'jquery'], function(override, $) {
                             });
                         });
                     },
-                    
+
                     actionbuttons: {
                         actionButtonCellContentTemplate: (function() {
                             var el = document.createElement('div');
