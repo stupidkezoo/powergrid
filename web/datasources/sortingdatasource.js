@@ -1,4 +1,4 @@
-define(['util'], function(util) {
+define(['util', 'jquery'], function(util, $) {
     function SortingDataSource(delegate) {
         var self = this;
         this.delegate = delegate;
