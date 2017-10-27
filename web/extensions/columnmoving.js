@@ -1,5 +1,5 @@
-define(['../override', 'veinjs', '../utils', 'jquery'], function(override, vein, utils, $) {
-    'use strict';
+define(['override', 'vein', 'utils'], function(override, vein, utils) {
+    "use strict";
 
     function updateStyle(selector, style) {
         $(selector).css(style);
@@ -64,7 +64,7 @@ define(['../override', 'veinjs', '../utils', 'jquery'], function(override, vein,
 
                                 // find the new index for the column
                                 for (var newIdx = start, cw = 0; newIdx < end; newIdx++) {
-                                    if (idx != newIdx) cw += grid.options.columns[newIdx].width;
+                                    if (idx != newIdx && !grid.options.columns[newIdx].hidden) cw += grid.options.columns[newIdx].width;
                                     if (cw > newPos) break;
                                 }
 

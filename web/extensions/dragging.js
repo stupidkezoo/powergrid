@@ -1,5 +1,5 @@
-define(['../override', 'veinjs', '../utils', 'jquery'], function(override, vein, utils, $) {
-    'use strict';
+define(['override', 'vein', 'utils'], function(override, vein, utils) {
+    "use strict";
 
     return {
         loadFirst: ['filtering'],
@@ -31,7 +31,7 @@ define(['../override', 'veinjs', '../utils', 'jquery'], function(override, vein,
                             offset = event.offsetX || event.originalEvent.layerX || 0;
 
                             if(offset <= header.offsetWidth - 8 && offset >= 8) {
-                                cells = $(grid.target).find('> .powergrid > .pg-rowgroup > .pg-container > .pg-row > .pg-column' + grid.normalizeCssClass(key) + ', > .powergrid > .pg-rowgroup > .pg-container > .pg-row > .pg-inner-row > .pg-column' + grid.normalizeCssClass(key) + ', > .powergrid > .pg-columnheaders > .pg-container > .pg-row > .pg-column' + key + '');
+                                cells = $(grid.target).find('> .powergrid > .pg-rowgroup > .pg-container > .pg-row > .pg-column' + key + ', > .powergrid > .pg-rowgroup > .pg-container > .pg-row > .pg-inner-row > .pg-column' + key + ', > .powergrid > .pg-columnheaders > .pg-container > .pg-row > .pg-column' + key + ''); //$(grid.target).find(".pg-column" + key);
 
                                 tracking = true;
                                 dragstarted = false;
@@ -127,11 +127,12 @@ define(['../override', 'veinjs', '../utils', 'jquery'], function(override, vein,
 
                                 dragstarted = false;
 
-                                $(grid.baseSelector + ' .pg-column' + grid.normalizeCssClass(col.key)).css({ 'transform': '' });
+                                $(grid.baseSelector + ' .pg-column' + col.key).css({ 'transform': '' });
                                 cells.removeClass('pg-columndragging');
 
                                 event.preventDefault();
                                 event.stopImmediatePropagation();
+                                $(header).css({ 'transform': 'translate(0px, 0px)' });
                             }
 
                             // clean up

@@ -1,6 +1,6 @@
-define(['../override', '../utils', 'jquery'], function(override, utils, $) {
+define(['override', 'utils', 'jquery'], function(override, utils, $) {
 
-    'use strict';
+    "use strict";
 
     return {
         loadFirst: ['filtering'],
@@ -9,7 +9,7 @@ define(['../override', '../utils', 'jquery'], function(override, utils, $) {
                 return {
                     renderHeaderCell: function() {
                         var h = $super.renderHeaderCell.apply(this, arguments);
-                        var handle = $('<div class=\'pg-resizehandle\'></div>');
+                        var handle = $('<div class='pg-resizehandle'></div>');
                         h.append(handle);
                         return h;
                     },
@@ -18,7 +18,7 @@ define(['../override', '../utils', 'jquery'], function(override, utils, $) {
                         for (var x = 0, l = this.options.columns.length; x < l; x++) {
                             var column = this.options.columns[x];
                             var width = this.loadSetting(column.key + '_width');
-                            if (width !== undefined && width !== null && width !== '') {
+                            if (width !== undefined && width !== null && width !== "") {
                                 column.width = width;
                             }
                         }

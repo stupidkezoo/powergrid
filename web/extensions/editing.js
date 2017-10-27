@@ -1,6 +1,6 @@
-define(['../override', 'jquery', '../utils'], function(override, $, utils) {
+define(['override', 'jquery', 'utils'], function(override, $, utils) {
 
-    'use strict';
+    "use strict";
 
     return function(grid, pluginOptions) {
         override(grid, function($super) {
@@ -44,8 +44,11 @@ define(['../override', 'jquery', '../utils'], function(override, $, utils) {
                     grid: grid,
                     editors: {},
 
-                    addEditor: function(column, editor) {
-                        this.editors[column.key] = editor;
+                    addEditor: function(type, editor) {
+                        if (!pluginOptions.editors) {
+                           pluginOptions.editors = {};
+                        }
+                        pluginOptions.editors[type] = editor;
                     },
 
                     isEditable: function(record, column) {
@@ -58,8 +61,8 @@ define(['../override', 'jquery', '../utils'], function(override, $, utils) {
 
                     startEdit: function(target, key, record, rowIdx) {
                         var column = grid.getColumnForKey(key);
-                        var oldValue = utils.getValue(record, key);
-                        var editor = this.createEditor(record, column, oldValue);
+                        var oldValue = record[key];
+                        var editor = this.createEditor(record, column, oldValue, target);
                         var editing = this;
 
                         grid.scrollToCell(rowIdx, key);
@@ -199,7 +202,16 @@ define(['../override', 'jquery', '../utils'], function(override, $, utils) {
                     },
 
                     updateCellEditability: function(row, column, cellElement) {
-                        $(cellElement).toggleClass('pg-editable', this.isEditable(row, column));
+                        $(cellElement).toggleClass('pg-editable', this.isEditable(row, column));;
+
+                        if (column.type === 'checkbox'){
+                            var control = cellElement.children()[0];
+                            if (this.isEditable(row, column)) {
+                              control.removeAttribute('disabled');
+                            } else
+                            { control.setAttribute('disabled', true);}
+
+                        }
                     }
                 }
             }

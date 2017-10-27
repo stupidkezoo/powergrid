@@ -1,12 +1,12 @@
-define(['../override', '../utils', 'jquery'],
+define(['override', 'utils', 'jquery'],
        function(override, utils, $) {
-    'use strict';
+    "use strict";
 
     return {
         init: function(grid, pluginOptions) {
 
             function autosize(col, shrink) {
-                var cells = grid.target.find('.pg-cell[data-column-key=\'' + col.key + '\']');
+                var cells = grid.target.find('.pg-cell[data-column-key='' + col.key + '']');
 
                 if(!cells.length) {
                     // no visible cells, so leave column as is.

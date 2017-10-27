@@ -1,8 +1,8 @@
 /**
  * Will display columns with type "checkbox" or "radio" as respective inputs
  */
-define(['jquery','../override', '../utils'], function($, override, utils) {
-    'use strict';
+define(['jquery','override'], function($, override) {
+    "use strict";
 
     return {
         loadFirst: ['editing'],
@@ -39,7 +39,7 @@ define(['jquery','../override', '../utils'], function($, override, utils) {
                     },
 
                     renderCellContent: function(record, column) {
-                        var value = utils.getValue(record, column.key);
+                        var value = record[column.key];
                         if(this.directinput.isDirectInput(column)) {
                             var input = document.createDocumentFragment();
                             if((value !== null && value !== undefined) || column.hideOnNull == false) {
@@ -61,7 +61,7 @@ define(['jquery','../override', '../utils'], function($, override, utils) {
                         },
 
                         createInput: function(record, column, value) {
-                            var control = $('<input type=\'' + column.type + '\' class=\'pg-directinput\'>').attr('checked', value);
+                            var control = $('<input type=''' + column.type + ''' class='pg-directinput'>').attr('checked', value);
 
                             if(!grid.editing || !grid.editing.isEditable(record, column)) {
                                 control.attr('disabled', true);
