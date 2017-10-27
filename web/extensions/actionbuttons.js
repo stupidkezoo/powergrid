@@ -1,9 +1,9 @@
-define(['../override', 'jquery'], function(override, $) {
+define(['override', 'jquery'], function(override, $) {
     //TODO port enable/disable of buttons logic.
     //TODO Do we still need special handling for group action buttons?
     //TODO visibility formula??
 
-
+    "use strict";
 
     return {
         loadFirst: ['directinput'],
@@ -67,7 +67,7 @@ define(['../override', 'jquery'], function(override, $) {
                         b.setAttribute('data-disable-on-readonly', (action.disableOnReadOnly) ? action.disableOnReadOnly : false);
                     }
 
-                    if(action.disabled && allowDynamics) {
+                    if((action.disableOnReadOnly || action.disabled) && allowDynamics) {
                         if(datastore.getGlobalAttribute(record.id, action.eventName, 'actionDisabled')) {
                             b.setAttribute('disabled', 'disabled');
                         }
@@ -90,7 +90,7 @@ define(['../override', 'jquery'], function(override, $) {
                         var isActionCol = column.type == 'ACTION';
                         var hasActions = column.actions != null && column.actions.length > 0;
                         if(!isActionCol && !hasActions) {
-                            return $super.renderCellContent(record, column, value);
+                            return $super.renderCellContent(record, column, value);;
                         }
                         var cellContent;
                         if (hasActions) {
@@ -117,8 +117,16 @@ define(['../override', 'jquery'], function(override, $) {
                                     if (action.hidden) {
                                         pluginOptions.datastore.registerGlobalAttribute(action.eventName , 'actionHidden', action.hidden);
                                     }
-                                    if (action.disabled) {
-                                        pluginOptions.datastore.registerGlobalAttribute(action.eventName , 'actionDisabled', action.disabled);
+                                    if (action.disabled || action.disableOnReadOnly) {
+                                        var f;
+                                        if(action.disabled && action.disableOnReadOnly) {
+                                            f = '$' + column.key + '.readOnly || (' + action.disabled + ')';
+                                        } else if(action.disabled) {
+                                            f = action.disabled;
+                                        } else if(action.disableOnReadOnly) {
+                                            f = '$' + column.key + '.readOnly';
+                                        }
+                                        pluginOptions.datastore.registerGlobalAttribute(action.eventName , 'actionDisabled', f);
                                     }
                                     if (action.cssClassFormula) {
                                         pluginOptions.datastore.registerGlobalAttribute(action.eventName , 'actionCssClassFormula', action.cssClassFormula);
