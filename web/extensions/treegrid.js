@@ -299,6 +299,9 @@ define(['../override', 'jquery', '../utils'], function(override, $, utils) {
                 var children = this.children(nodes);
                 parentMatches = this.rowOrAncestorMatches(nodes);
                 nodes = children;
+            } else if(nodes.children) {
+                // In case row data is array but has children defined
+                nodes = nodes.children;
             }
 
             if(nodes) build(nodes, 0, true, parentMatches, statistics);
@@ -333,8 +336,8 @@ define(['../override', 'jquery', '../utils'], function(override, $, utils) {
         children: function(row) {
             if (!this.childrenByIdMap[row.id]) {
                 var children = row.children || this.delegate && typeof this.delegate.children === 'function' && this.delegate.children.apply(this.delegate, arguments);
-                this.childrenByIdMap[row.id] = children;
-                if(children !== undefined) {
+                if(children) {
+                    this.childrenByIdMap[row.id] = children;
                     for(var x=0,l=children.length;x<l;x++) {
                         this.parentByIdMap[children[x].id] = row.id;
                     }
