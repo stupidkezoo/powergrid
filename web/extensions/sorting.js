@@ -11,6 +11,8 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                     if (sortSettings !== undefined && sortSettings !== null && sortSettings !== '') {
                         sortColumns = sortSettings;
                     }
+                    pluginOptions.onSortColumnsChanged
+                        && pluginOptions.onSortColumnsChanged(sortSettings);
                 }
                 return {
                     init: function() {
@@ -23,27 +25,38 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                         $super.init();
                         this.container.on('click', '.pg-columnheader', function(event) {
                             var key = $(this).attr('data-column-key'),
-                                col = grid.getColumnForKey(key),
-                                direction;
+                                multi = pluginOptions.multiSort && event.shiftKey,
+                                sortColumnsFiltered = [],
+                                sortColumn;
 
-                            if(sortColumns[0] && sortColumns[0].key === key) {
-                                direction = sortColumns[0].direction;
+                            for(let sc of sortColumns) {
+                                if(multi && sc.key !== key) {
+                                    sortColumnsFiltered.push(sc);
+                                } else {
+                                    if(sc.key === key) {
+                                        // found matching
+                                        sortColumn = sc;
+                                    }
+
+                                    $('.pg-columnheader[data-column-key=' + sc.key + ']')
+                                        .removeClass('pg-sort-ascending pg-sort-descending');
+                                }
                             }
-
+                            
+                            var direction = sortColumn && sortColumn.direction;
                             if(direction == 'ascending') {
                                 direction = 'descending';
                             } else {
                                 direction = 'ascending';
                             }
 
-                            grid.target.find('.pg-sort-ascending, .pg-sort-descending').removeClass('pg-sort-ascending pg-sort-descending');
                             $(this).addClass('pg-sort-' + direction);
-
-                            sortColumns = [{ key: key, direction: direction }].concat(sortColumns.filter(function(e) {
-                                return e.key !== key;
-                            }));
+                            
+                            sortColumns = [{ key: key, direction: direction }].concat(sortColumnsFiltered);
                             grid.sorting.sort(sortColumns);
                             grid.saveSetting('sorting', sortColumns);
+                            pluginOptions.onSortColumnsChanged
+                                && pluginOptions.onSortColumnsChanged(sortColumns);
                         });
 
                         $(grid.dataSource).one('dataloaded', function(e) {
@@ -58,8 +71,11 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                             header.append('<div class=\'pg-sorter\'>');
                             header.addClass('pg-sortable');
                             var key = typeof column.key === 'string' ? column.key : JSON.stringify(column.key);
-                            if(sortColumns[0] && sortColumns[0].key === key) {
-                                header.addClass('pg-sort-' + sortColumns[0].direction);
+                            for(let sc of sortColumns) {
+                                if(sc.key === key) {
+                                    header.addClass('pg-sort-' + sc.direction);
+                                    break;
+                                }
                             }
                         }
 
