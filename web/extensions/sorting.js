@@ -32,7 +32,7 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                                 sortColumn;
 
                             // should add to the existing columns?
-                            var multi = pluginOptions.multiSort && event.shiftKey;
+                            var multi = pluginOptions.multiSort;
 
                             // iterate through sortColumns, searching for the selected column 
                             // and filtering existing columns to include.
@@ -54,19 +54,18 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                                 }
                             }
                             
-                            // flip the direction of the selected column
-                            var direction = sortColumn && sortColumn.direction;
-                            if(direction == 'ascending') {
-                                direction = 'descending';
-                            } else {
-                                direction = 'ascending';
-                            }
+                            var direction = grid.sorting.getDirectionToggled(sortColumn);
+                            if(direction) {
+                                // add the new class
+                                $(this).addClass('pg-sort-' + direction);
 
-                            // add the new class
-                            $(this).addClass('pg-sort-' + direction);
-                            
-                            // prepend the new sort column to the columns filtered
-                            sortColumns = [{ key: key, direction: direction }].concat(sortColumnsFiltered);
+                                // prepend the new sort column to the columns filtered
+                                sortColumns = [{ key: key, direction: direction }].concat(sortColumnsFiltered);
+
+                            } else {
+                                // current column is removed from the list
+                                sortColumns = sortColumnsFiltered;
+                            }
 
                             grid.sorting.sort(sortColumns);
                             grid.saveSetting('sorting', sortColumns);
@@ -108,6 +107,18 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                                 console.warn && console.warn('Trying to sort unsortable datasource');
                             } else {
                                 grid.dataSource.sort(this.compareRow.bind(this, columnSettings), columnSettings);
+                            }
+                        },
+
+                        getDirectionToggled(sortColumn) {
+                            var direction = sortColumn && sortColumn.direction;
+                            if(!direction) {
+                                return 'ascending';
+                            } else if(direction === 'ascending') {
+                                return 'descending';
+                            } else {
+                                // no direction - remove from selection
+                                return undefined;
                             }
                         },
 
