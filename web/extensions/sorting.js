@@ -11,6 +11,11 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                     if (sortSettings !== undefined && sortSettings !== null && sortSettings !== '') {
                         sortColumns = sortSettings;
                     }
+
+                    // notify the consumer that the columns changed
+                    if(pluginOptions.onSortColumnsChanged) {
+                        pluginOptions.onSortColumnsChanged(sortSettings);
+                    }
                 }
                 return {
                     init: function() {
@@ -23,27 +28,52 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                         $super.init();
                         this.container.on('click', '.pg-columnheader', function(event) {
                             var key = $(this).attr('data-column-key'),
-                                col = grid.getColumnForKey(key),
-                                direction;
+                                sortColumnsFiltered = [],
+                                sortColumn;
 
-                            if(sortColumns[0] && sortColumns[0].key === key) {
-                                direction = sortColumns[0].direction;
+                            // should add to the existing columns?
+                            var multi = pluginOptions.multiSort;
+
+                            // iterate through sortColumns, searching for the selected column 
+                            // and filtering existing columns to include.
+                            for(let sc of sortColumns) {
+                                if(multi && sc.key !== key) {
+                                    // multi-select: include the old column
+                                    sortColumnsFiltered.push(sc);
+
+                                } else {
+                                    if(sc.key === key) {
+                                        // found the selected column
+                                        sortColumn = sc;
+                                    }
+
+                                    // Remove the old class. Include the selected column too,
+                                    // because the direction will be changed later.
+                                    $('.pg-columnheader[data-column-key=' + sc.key + ']')
+                                        .removeClass('pg-sort-ascending pg-sort-descending');
+                                }
                             }
+                            
+                            var direction = grid.sorting.getDirectionToggled(sortColumn);
+                            if(direction) {
+                                // add the new class
+                                $(this).addClass('pg-sort-' + direction);
 
-                            if(direction == 'ascending') {
-                                direction = 'descending';
+                                // prepend the new sort column to the columns filtered
+                                sortColumns = [{ key: key, direction: direction }].concat(sortColumnsFiltered);
+
                             } else {
-                                direction = 'ascending';
+                                // current column is removed from the list
+                                sortColumns = sortColumnsFiltered;
                             }
 
-                            grid.target.find('.pg-sort-ascending, .pg-sort-descending').removeClass('pg-sort-ascending pg-sort-descending');
-                            $(this).addClass('pg-sort-' + direction);
-
-                            sortColumns = [{ key: key, direction: direction }].concat(sortColumns.filter(function(e) {
-                                return e.key !== key;
-                            }));
                             grid.sorting.sort(sortColumns);
                             grid.saveSetting('sorting', sortColumns);
+
+                            // notify the consumer that the columns changed
+                            if(pluginOptions.onSortColumnsChanged) {
+                                pluginOptions.onSortColumnsChanged(sortColumns);
+                            }
                         });
 
                         $(grid.dataSource).one('dataloaded', function(e) {
@@ -58,8 +88,13 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                             header.append('<div class=\'pg-sorter\'>');
                             header.addClass('pg-sortable');
                             var key = typeof column.key === 'string' ? column.key : JSON.stringify(column.key);
-                            if(sortColumns[0] && sortColumns[0].key === key) {
-                                header.addClass('pg-sort-' + sortColumns[0].direction);
+
+                            // loop through the sort columns, adding the sort class to the header
+                            for(let sc of sortColumns) {
+                                if(sc.key === key) {
+                                    header.addClass('pg-sort-' + sc.direction);
+                                    break;
+                                }
                             }
                         }
 
@@ -72,6 +107,18 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                                 console.warn && console.warn('Trying to sort unsortable datasource');
                             } else {
                                 grid.dataSource.sort(this.compareRow.bind(this, columnSettings), columnSettings);
+                            }
+                        },
+
+                        getDirectionToggled(sortColumn) {
+                            var direction = sortColumn && sortColumn.direction;
+                            if(!direction) {
+                                return 'ascending';
+                            } else if(direction === 'ascending') {
+                                return 'descending';
+                            } else {
+                                // no direction - remove from selection
+                                return undefined;
                             }
                         },
 
