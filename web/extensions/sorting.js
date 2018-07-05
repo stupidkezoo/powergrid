@@ -11,8 +11,11 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                     if (sortSettings !== undefined && sortSettings !== null && sortSettings !== '') {
                         sortColumns = sortSettings;
                     }
-                    pluginOptions.onSortColumnsChanged
-                        && pluginOptions.onSortColumnsChanged(sortSettings);
+
+                    // notify the consumer that the columns changed
+                    if(pluginOptions.onSortColumnsChanged) {
+                        pluginOptions.onSortColumnsChanged(sortSettings);
+                    }
                 }
                 return {
                     init: function() {
@@ -25,24 +28,33 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                         $super.init();
                         this.container.on('click', '.pg-columnheader', function(event) {
                             var key = $(this).attr('data-column-key'),
-                                multi = pluginOptions.multiSort && event.shiftKey,
                                 sortColumnsFiltered = [],
                                 sortColumn;
 
+                            // should add to the existing columns?
+                            var multi = pluginOptions.multiSort && event.shiftKey;
+
+                            // iterate through sortColumns, searching for the selected column 
+                            // and filtering existing columns to include.
                             for(let sc of sortColumns) {
                                 if(multi && sc.key !== key) {
+                                    // multi-select: include the old column
                                     sortColumnsFiltered.push(sc);
+
                                 } else {
                                     if(sc.key === key) {
-                                        // found matching
+                                        // found the selected column
                                         sortColumn = sc;
                                     }
 
+                                    // Remove the old class. Include the selected column too,
+                                    // because the direction will be changed later.
                                     $('.pg-columnheader[data-column-key=' + sc.key + ']')
                                         .removeClass('pg-sort-ascending pg-sort-descending');
                                 }
                             }
                             
+                            // flip the direction of the selected column
                             var direction = sortColumn && sortColumn.direction;
                             if(direction == 'ascending') {
                                 direction = 'descending';
@@ -50,13 +62,19 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                                 direction = 'ascending';
                             }
 
+                            // add the new class
                             $(this).addClass('pg-sort-' + direction);
                             
+                            // prepend the new sort column to the columns filtered
                             sortColumns = [{ key: key, direction: direction }].concat(sortColumnsFiltered);
+
                             grid.sorting.sort(sortColumns);
                             grid.saveSetting('sorting', sortColumns);
-                            pluginOptions.onSortColumnsChanged
-                                && pluginOptions.onSortColumnsChanged(sortColumns);
+
+                            // notify the consumer that the columns changed
+                            if(pluginOptions.onSortColumnsChanged) {
+                                pluginOptions.onSortColumnsChanged(sortColumns);
+                            }
                         });
 
                         $(grid.dataSource).one('dataloaded', function(e) {
@@ -71,6 +89,8 @@ define(['../override', 'jquery', '../utils', '../datasources/sortingdatasource.j
                             header.append('<div class=\'pg-sorter\'>');
                             header.addClass('pg-sortable');
                             var key = typeof column.key === 'string' ? column.key : JSON.stringify(column.key);
+
+                            // loop through the sort columns, adding the sort class to the header
                             for(let sc of sortColumns) {
                                 if(sc.key === key) {
                                     header.addClass('pg-sort-' + sc.direction);
