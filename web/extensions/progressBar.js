@@ -1,4 +1,4 @@
-define(['../override', 'jquery', '../utils'], function(override, $) {
+define(['../override', 'jquery', '../utils'], function(override, $, utils) {
     return {
         loadFirst: ['directinput'],
         init: function(grid, pluginOptions) {
@@ -36,11 +36,11 @@ define(['../override', 'jquery', '../utils'], function(override, $) {
                             return cell;
                         })(),
 
-                        //TODO need to do through value instead of record[6], value is undefined at this moment
-                        renderProgressBar: function(record, column, value) {
+                        renderProgressBar: function(record, column) {
                             let cellContent = this.progressBarCellContentTemplate.cloneNode();
+                            let value = utils.getValue(record, column.key);
 
-                            if (record[6] === undefined) {
+                            if (value === undefined) {
                                 return cellContent;
                             }
 
@@ -49,8 +49,8 @@ define(['../override', 'jquery', '../utils'], function(override, $) {
 
                             let progressBar = document.createElement('div');
                             progressBar.setAttribute('class', 'pg-progress-bar');
-                            progressBar.setAttribute('style', 'width: ' + record[6] + '%');
-                            progressBar.textContent = record[6] + ' %';
+                            progressBar.setAttribute('style', 'width: ' + value + '%');
+                            progressBar.textContent = value + ' %';
 
                             progress.appendChild(progressBar);
                             cellContent.appendChild(progress);
