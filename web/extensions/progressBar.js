@@ -14,30 +14,21 @@ define(['../override', 'jquery', '../utils'], function(override, $, utils) {
                         return cell;
                     },
 
-                    renderCellContent: function renderCellContent(record, column, value) {
-                        let cellContent;
-                        let isProgressBarCol = column.type === 'PROGRESS_BAR';
+                    renderCellContent: function(record, column, value) {
+                        const isProgressBarCol = column.type === 'PROGRESS_BAR';
                         if(!isProgressBarCol) {
                             return $super.renderCellContent(record, column, value);
                         }
-                        else {
-                            cellContent = this.progressBar.renderProgressBar(record, column, value);
-                        }
-
-                        let fragment = document.createDocumentFragment();
+                        const cellContent = this.progressBar.renderProgressBar(record, column, value);
+                        const fragment = document.createDocumentFragment();
                         fragment.appendChild(cellContent);
                         fragment.appendChild($super.renderCellContent(record, column, value));
                         return fragment;
                     },
 
                     progressBar: {
-                        progressBarCellContentTemplate: (function() {
-                            let cell = document.createElement('div');
-                            return cell;
-                        })(),
-
                         renderProgressBar: function(record, column) {
-                            let cellContent = this.progressBarCellContentTemplate.cloneNode();
+                            let cellContent = document.createElement('div');
                             let value = utils.getValue(record, column.key);
 
                             if (value === undefined) {
@@ -55,10 +46,6 @@ define(['../override', 'jquery', '../utils'], function(override, $, utils) {
                             progress.appendChild(progressBar);
                             cellContent.appendChild(progress);
 
-                            if(!column) {
-                                column = grid.options.columns.filter(function(c) { return c.type == 'progress_bar'; })[0];
-                                if(!column) return;
-                            }
                             return cellContent;
                         },
                     },
