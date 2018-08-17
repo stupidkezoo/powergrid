@@ -96,6 +96,7 @@ define(['../override', 'jquery', '../utils'], function(override, $, utils) {
                     },
 
                     commit: function(target, record, rowIdx, column, value, oldValue, move) {
+                        value = utils.getValidValueForColumn(column, value, oldValue);
                         try {
                             grid.dataSource.setValue(record.id, column.key, value);
                         } catch(e) {

@@ -41,6 +41,16 @@
         o[p[x]] = value;
     }
 
+    function getValidValueForColumn(column,value, oldValue) {
+        if (column.type === 'PROGRESS_BAR') {
+            if (isNaN(value) || value < 0 || value > 100 ) {
+                console.log('Incorrect data for progress value');
+                return oldValue;
+            }
+        }
+        return value;
+    }
+
     define(['jquery'], function($) {
         return {
             inAnimationFrame: function(f, queue) {
@@ -105,7 +115,8 @@
             },
 
             getValue: getValue,
-            setValue: setValue
+            setValue: setValue,
+            getValidValueForColumn: getValidValueForColumn
         }
     });
 })(define);
