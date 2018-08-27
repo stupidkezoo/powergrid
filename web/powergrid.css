@@ -665,3 +665,15 @@ ul.pg-menu > li:hover {
     border-color: transparent;
 }
 
+.pg-progress {
+    width: 100%;
+    background-color: white;
+}
+
+.pg-progress-bar {
+    height: 20px;
+    background-color: #4CAF50;
+    font-weight: bold;
+    text-align: center;
+    font-size: 15px;
+}
