@@ -1,3 +1,9 @@
+/***
+ * progressBar extension.
+ * Enabled when column type is 'PROGRESS_BAR'.
+ * Represents a graphic view of progress value.
+ * Value should be a number from 0 to 100.
+ */
 define(['../override', 'jquery', '../utils'], function(override, $, utils) {
     return {
         loadFirst: ['directinput'],
