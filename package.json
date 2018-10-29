@@ -1,5 +1,5 @@
 {
-  "name": "powergrid",
+  "name": "@pearlchain/powergrid",
   "version": "0.0.1",
   "main": "web/main.js",
   "dependencies": {
