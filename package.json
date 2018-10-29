@@ -11,6 +11,9 @@
     "veinjs": "github:israelidanny/veinjs",
     "w2ui": "^1.4.3"
   },
+  "publishConfig": {
+    "registry": "https://nexus.pearlchain.net/repository/npm-internal/"
+  },
   "devDependencies": {
     "babel-core": "^6.10.4",
     "babel-eslint": "^6.1.2",
