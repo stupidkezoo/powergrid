@@ -43,8 +43,9 @@
 
     function getValidValueForColumn(column,value, oldValue) {
         if (column.type === 'PROGRESS_BAR') {
-            if (isNaN(value) || value < 0 || value > 100 ) {
-                console.log('Incorrect data for progress value');
+            value = value.replace(/ /g,'');
+            if (isNaN(value) || value < 0 || value > 100 || value === '' ) {
+                console.log('Incorrect data for progress value: ' + value);
                 return oldValue;
             }
         }

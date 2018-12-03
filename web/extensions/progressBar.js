@@ -31,6 +31,10 @@ define(['../override', 'jquery', '../utils'], function(override, $, utils) {
                                 return cellContent;
                             }
 
+                            if (value === null) {
+                                value = 0;
+                            }
+
                             let progress = document.createElement('div');
                             progress.setAttribute('class', 'pg-progress');
 
