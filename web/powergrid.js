@@ -1065,8 +1065,14 @@ define(['jquery', 'veinjs', './utils', './promise'], function($, vein, utils, Pr
 
         renderHeaderCell: function renderHeaderCell(column, columnIdx) {
             // Render the cell for the header
-            return $('<div class=\'pg-columnheader\'>').append($('<span>').text(column.title));
+            return $('<div class=\'pg-columnheader\'>').append($('<input type=\"checkbox\" onclick="function (event) {var checkboxRows = document.querySelectorAll(\'[data-column-key="0"].pg-cell\');\n' +
+                '    checkboxRows.forEach(function (checkbox) {\n' +
+                '        checkbox.firstChild.checked = !event.target.checked;\n' +
+                '        checkbox.firstChild.click();\n' +
+                '    });}"/>'));
+
         },
+        
 
         renderCellTemplate: (function() {
             var el = document.createElement('div');
