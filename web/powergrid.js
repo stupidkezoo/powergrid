@@ -1072,7 +1072,7 @@ define(['jquery', 'veinjs', './utils', './promise'], function($, vein, utils, Pr
                 '    });}"/>'));
 
         },
-        
+
 
         renderCellTemplate: (function() {
             var el = document.createElement('div');
